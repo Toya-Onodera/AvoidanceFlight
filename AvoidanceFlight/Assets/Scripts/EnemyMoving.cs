@@ -5,7 +5,7 @@ using System.Collections;
 public partial class EnemyMoving : MonoBehaviour
 {
     // 自分 (Enemy)
-    private GameObject _mine;
+    // private GameObject _mine;
     private float _speed;
     private int _angle;
     private Vector2 _min;
@@ -17,8 +17,8 @@ public partial class EnemyMoving : MonoBehaviour
     public virtual void Start()
     {
         var cameraObj = (CameraPosition) GameObject.Find("Main Camera").GetComponent(typeof(CameraPosition));
-        this._min = (Vector2) cameraObj.MINVisivleList;
-        this._max = (Vector2) cameraObj.MAXVisivleList;
+        this._min = (Vector2) cameraObj.minVisibleList;
+        this._max = (Vector2) cameraObj.maxVisibleList;
         this._speed = ((EnemyPrefab) GameObject.Find("EnemyBox").GetComponent(typeof(EnemyPrefab))).speed;
         this._difficulty = ((EnemyPrefab) GameObject.Find("EnemyBox").GetComponent(typeof(EnemyPrefab))).difficulty;
         
@@ -37,9 +37,10 @@ public partial class EnemyMoving : MonoBehaviour
             this.transform.Translate(this.transform.up * 0.0003f);
         }
 
-        Vector2 mPos = this._mine.transform.position;
+        var mTra = this.transform;
+        var mPos = mTra.position;
         mPos.x -= (this._speed * Time.deltaTime);
-        this._mine.transform.position = mPos;
+        mTra.position = mPos;
         
         // 可視領域から消えた場合、要素を削除
         if (this.transform.position.x < (this._min.x - 0.5f))

@@ -7,35 +7,36 @@ using UnityEngine.UI;
 [System.Serializable]
 public partial class Player : MonoBehaviour
 {
-    public static bool GameOverFlg = false;
-    private int _mode = 0;
+    public static bool GameOverFlg;
+    private int _mode;
     private Vector2 _min;
     private Vector2 _max;
-    private Rigidbody2D _force;
-    private GameObject _gameOverText;
-    private GameObject _bom;
-    private GameObject _canvas;
-    private GameObject _point;
-    private GameObject[] _buttons;
+    public Rigidbody2D _force;
+    public GameObject _gameOverText;
+    public GameObject _bom;
+    public GameObject _pointCanvas;
+    public GameObject _point;
+    public GameObject[] _buttons;
     private AudioSource _mainTheme;
     private AudioSource _getSe;
     private AudioSource _bombSe;
     private AudioSource _spaceshipSe;
     private Renderer _renderer;
-    private Text _text;
     private EventSystem _eventSystem;
+
+    public virtual void Awake()
+    {
+        Player.GameOverFlg = false;
+    }
 
     public virtual void Start()
     {
         _eventSystem = GameObject.FindObjectOfType<EventSystem>();
-        _text = this._gameOverText.GetComponent<UnityEngine.UI.Text>();
         _renderer = this.GetComponent<Renderer>();
         
         var cameraObj = (CameraPosition) GameObject.Find("Main Camera").GetComponent(typeof(CameraPosition));
-        this._min = (Vector2) cameraObj.MINVisivleList;
-        this._max = (Vector2) cameraObj.MAXVisivleList;
-        this._force = this.GetComponent<Rigidbody2D>();
-        this._gameOverText = GameObject.Find("GameOver");
+        this._min = (Vector2) cameraObj.minVisibleList;
+        this._max = (Vector2) cameraObj.maxVisibleList;
         this._gameOverText.GetComponent<UnityEngine.UI.Text>().enabled = false;
         this._buttons = GameObject.FindGameObjectsWithTag("Buttons");
         this.ButtonSetVisible(false);
@@ -44,6 +45,8 @@ public partial class Player : MonoBehaviour
         this._mainTheme = audioSources[0];
         this._getSe = audioSources[1];
         this._bombSe = audioSources[2];
+
+        this._mode = 0;
     }
 
     public virtual void Update()
@@ -65,7 +68,6 @@ public partial class Player : MonoBehaviour
     public virtual void MyBehavior()
     {
         var playerSpeed = 0.04f;
-        Transform mTra;
         Vector3 mPos;
         
         // 最初に Player をスタート位置へ移動させる
@@ -73,23 +75,24 @@ public partial class Player : MonoBehaviour
         {
             if (this.transform.position.x <= -8f)
             {
-                mTra = this.transform;
+                var mTra = this.transform;
                 mPos = mTra.position;
                 mPos.x += 0.02f;
                 mTra.position = mPos;
-                
+            }
+            
+            if (CameraPosition.StartFlg)
+            {
+                this._mode += 1;
+                this._force.WakeUp();
+                this._mainTheme.Play();
+            }
+
+            else
+            {
                 this._force.Sleep();
             }
             
-            else
-            {
-                if (CameraPosition.Start_flg)
-                {
-                    this._mode += 1;
-                    this._force.WakeUp();
-                    this._mainTheme.Play();
-                }
-            }
         }
         
         // Player をキーボード入力で移動 (横)、左クリックで上昇
@@ -111,7 +114,7 @@ public partial class Player : MonoBehaviour
             if (Input.GetKey(KeyCode.LeftArrow))
             {
                 mPos = this.transform.position;
-                mPos.x += this.SpeedChanger(playerSpeed);
+                mPos.x -= this.SpeedChanger(playerSpeed);
                 this.transform.position = mPos;
             }
             
@@ -126,7 +129,7 @@ public partial class Player : MonoBehaviour
     {
         if (Player.GameOverFlg == false)
         {
-            // 上か下の壁、もしくはEnemyに衝突した場合 ゲームオーバー
+            // 上か下の壁、もしくは Enemy に衝突した場合 ゲームオーバー
             if (obj.gameObject.CompareTag("Enemy") || obj.gameObject.CompareTag("Wall"))
             {
                 this.StartCoroutine(this.GameOverMode());
@@ -158,7 +161,7 @@ public partial class Player : MonoBehaviour
         UnityEngine.Object.Destroy(createBom.gameObject);
         yield return new WaitForSeconds(2.65f);
         
-        _text.enabled = true;
+        this._gameOverText.GetComponent<Text>().enabled = true;
         this.ButtonSetVisible(true);
         UnityEngine.Object.Destroy(this.gameObject);
     }
@@ -172,7 +175,7 @@ public partial class Player : MonoBehaviour
         var position = new Vector2(mPos.x + 0.45f, mPos.y);
         
         var plusPoint = UnityEngine.Object.Instantiate(this._point, Camera.main.WorldToScreenPoint(position), this.transform.rotation);
-        plusPoint.transform.SetParent(this._canvas.transform);
+        plusPoint.transform.SetParent(this._pointCanvas.transform);
         yield return new WaitForSeconds(0.8f);
         
         UnityEngine.Object.Destroy(plusPoint.gameObject);

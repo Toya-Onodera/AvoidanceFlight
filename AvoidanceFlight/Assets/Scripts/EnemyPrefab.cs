@@ -33,8 +33,8 @@ public partial class EnemyPrefab : MonoBehaviour
     public virtual void Start()
     {
         CameraPosition cameraObj = (CameraPosition) GameObject.Find("Main Camera").GetComponent(typeof(CameraPosition));
-        this.min = (Vector2) cameraObj.MINVisivleList;
-        this.max = (Vector2) cameraObj.MAXVisivleList;
+        this.min = (Vector2) cameraObj.minVisibleList;
+        this.max = (Vector2) cameraObj.maxVisibleList;
         this.StartCoroutine(this.EnemyGeneration());
         this.StartCoroutine(this.EnemyIncrease());
     }
