@@ -1798,7 +1798,7 @@ MonoBehaviour:
   _force: {fileID: 1916168337}
   _gameOverText: {fileID: 1664375080}
   _bom: {fileID: 1084328179522126, guid: c3de7463ba07f344c86a212b62a43f21, type: 3}
-  _canvas: {fileID: 1210664311}
+  _pointCanvas: {fileID: 995433263}
   _point: {fileID: 1788949809422080, guid: d60db1219da31d742a64a784bc81bffd, type: 3}
   _buttons:
   - {fileID: 1397914693}

@@ -99,7 +99,7 @@ public partial class Player : MonoBehaviour
         else
         {
             
-            if (Input.GetMouseButton(0) || (Input.touchCount > 0))
+            if (Input.GetMouseButton(0) || Input.GetKey(KeyCode.Space) || Input.touchCount > 0)
             {
                 this._force.AddForce(this.transform.up * 1.5f);
             }
